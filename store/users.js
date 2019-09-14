@@ -93,6 +93,16 @@ export const actions = {
         });
            
     },
+    async loadUser({ state, commit }){
+        try {
+            const res = await this.$axios.get('http://localhost:3085/user', {
+                withCredentials : true,
+            });
+            commit('setMe',res.data);
+        } catch (err) {
+            console.error(err);
+        }
+    },
     changeNicname( { commit } , payload ){
         commit('changeNicname',payload);
     },

@@ -47,12 +47,8 @@ export default {
         onSubmitForm(){
             if(this.$refs.form.validate()){
                 this.$store.dispatch('posts/addComment',{
-                    id: Date.now(),
                     postId : this.postId,
                     content: this.content,
-                    User : {
-                        nickname : this.me.nickname
-                    }
                 })
                 .then(() => {
                     this.content = '',
@@ -60,6 +56,9 @@ export default {
                     this.successMessages = '댓글이 작성되었습니다.',
                     this.hideDetails = false;
                 })
+                .catch((err) =>{
+                    console.error(err);
+                });
             }
         }
     }

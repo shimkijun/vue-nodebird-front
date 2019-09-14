@@ -66,6 +66,9 @@ export default {
             hashtag : ''
         }
     },
+    fetch({ store }){
+      return store.dispatch('users/loadUser');
+    },
     methods : {
       onSearchHashtag(){
         this.$router.push({

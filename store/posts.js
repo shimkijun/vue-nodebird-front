@@ -1,11 +1,10 @@
+import Vue from 'vue';
+
 export const state = () => ({
     mainPosts : [],
     hasMorePost : true,
-    imagePaths : []
+    imagePaths : [],
 });
-
-const totalPosts = 33;
-const limit = 10;
 
 export const mutations = {
     
@@ -13,28 +12,21 @@ export const mutations = {
        state.mainPosts.unshift(payload);
     },
     removeMainPost( state,payload ){
-        const index = state.mainPosts.findIndex( v => v.id === payload.id);
+        const index = state.mainPosts.findIndex( v => v.id === payload.postId);
         state.mainPosts.splice(index,1);
     },
-    addComment( state,payload ){
+    loadComments(state,payload){
         const index = state.mainPosts.findIndex( v => v.id === payload.postId);
+        //state.mainPosts[index].Comments = payload.data;
+        Vue.set(state.mainPosts[index], 'Comments', payload.data);
+    },
+    addComment( state,payload ){
+        const index = state.mainPosts.findIndex( v => v.id === payload.PostId);
         state.mainPosts[index].Comments.unshift(payload);
     },
-    loadPosts(state){
-        const diff = totalPosts - state.mainPosts.length;
-        const fakePosts = Array(diff > limit ? limit : diff ).fill().map( v => ({
-            id : Math.random().toString(),
-            User :
-            {
-                id : 1,
-                nickname : '제로초',
-            },
-            content : `Hello infinite sc~ ${Math.random()}`,
-            Comments : [],
-            Images : [],
-        }));
-        state.mainPosts = state.mainPosts.concat(fakePosts);
-        state.hasMorePost = fakePosts.length === limit;
+    loadPosts(state, payload){
+        state.mainPosts = state.mainPosts.concat(payload);
+        state.hasMorePost = payload.length === 10;
     }, 
     concatImagePaths(state,payload){
         state.imagePaths = state.imagePaths.concat(payload);
@@ -57,23 +49,68 @@ export const actions = {
         })
         .catch((err) => {
             console.error(err);
-            next(err);
         });
     },
     remove({ commit }, payload){
-        commit('removeMainPost' , payload )
+        this.$axios.delete(`http://localhost:3085/post/${payload.postId}`,{
+            withCredentials : true,
+        })
+        .then((res) => {
+            commit('removeMainPost' , payload )
+        })
+        .catch((err) => {
+            console.error(err);
+        });
     },
     addComment({ commit }, payload){
-        commit('addComment' , payload )
+        console.log(payload);
+        this.$axios.post(`http://localhost:3085/post/${payload.postId}/comment`,{
+            content : payload.content
+        },{
+            withCredentials : true,
+        })
+        .then((res) => {
+            commit('addComment' , res.data );
+        })
+        .catch((err) => {
+            console.error(err);
+        })
     },
-    loadPosts({ commit , state}, payload){
-        if(state.hasMorePost){
-            commit('loadPosts');
+    loadComments({ commit }, payload){
+        this.$axios.get(`http://localhost:3085/post/${payload.postId}/comments`)
+        .then((res) => {
+            commit('loadComments',{
+                postId: payload.postId,
+                data : res.data
+            });
+        })
+        .catch((err) => {
+            console.error(err);
+        })
+    },
+    async loadUser({ state, commit }){
+        try {
+            const res = await this.$axios.get('http://localhost:3085/user', {
+                withCredentials : true,
+            });
+            commit('setMe',res.data);
+        } catch (err) {
+            console.error(err);
+        }
+    },
+    async loadPosts({ commit , state}){
+        try {
+            if(state.hasMorePost){
+                const res = await this.$axios.get(`http://localhost:3085/posts?offset=${state.mainPosts.length}&limit=10`)
+                commit('loadPosts',res.data);
+            }
+        } catch (err) {
+            console.error(err);
         }
     },
     uploadImages({ commit , state}, payload){
         this.$axios.post('http://localhost:3085/post/images',payload,{
-            widthCredentials:true,
+            withCredentials:true,
         })
         .then((res) => {
             commit('concatImagePaths', res.data);
