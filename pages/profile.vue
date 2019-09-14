@@ -23,6 +23,9 @@
         <v-container>
           <v-subheader>Following</v-subheader>
           <follow-list :users="followingList" :remove="removeFollowing" />
+          <v-btn v-if="hasMoreFollowing" style="width:100%" @click="loadMoreFollowings">
+            더보기
+          </v-btn>
         </v-container>
       </v-card>
     </v-container>
@@ -31,6 +34,9 @@
         <v-container>
           <v-subheader>Followers</v-subheader>
           <follow-list :users="followerList" :remove="removeFollower" />
+          <v-btn v-if="hasMoreFollower" style="width:100%" @click="loadMoreFollowers">
+            더보기
+          </v-btn>
         </v-container>
       </v-card>
     </v-container>
@@ -57,7 +63,17 @@ export default {
       },
       followingList(){
         return this.$store.state.users.followingList;
+      },
+      hasMoreFollowing(){
+        return this.$store.state.users.hasMoreFollowing;
+      },
+      hasMoreFollower(){
+        return this.$store.state.users.hasMoreFollower;
       }
+    },
+    fetch({ store }){
+      store.dispatch('users/loadFollowers');
+      store.dispatch('users/loadFollowings');
     },
     methods : {
       onChangeNickname(){
@@ -67,10 +83,16 @@ export default {
         
       },
       removeFollowing(id){
-        this.$store.dispatch('users/removeFollowing',{id})
+        this.$store.dispatch('users/removeFollowing',{id});
       },
       removeFollower(id){
-        this.$store.dispatch('users/removeFollower',{id})
+        this.$store.dispatch('users/removeFollower',{id});
+      },
+      loadMoreFollowers(){
+        this.$store.dispatch('users/loadFollowers');
+      },
+      loadMoreFollowings(){
+        this.$store.dispatch('users/loadFollowings');
       }
     },
     head(){

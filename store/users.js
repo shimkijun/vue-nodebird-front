@@ -1,58 +1,14 @@
 export const state = () => ({
     me : null,
-    followerList : [
-        {
-            id : 1,
-            nickname : '팔로워1',
-        },
-        {
-            id : 2,
-            nickname : '팔로워2',
-        },
-        {
-            id : 3,
-            nickname : '팔로워3',
-        },
-        {
-            id : 4,
-            nickname : '팔로워4',
-        },
-        {
-            id : 5,
-            nickname : '팔로워5',
-        },
-        {
-            id : 6,
-            nickname : '팔로워6',
-        },
-        {
-            id : 7,
-            nickname : '팔로워7',
-        },
-        {
-            id : 8,
-            nickname : '팔로워8',
-        },
-        {
-            id : 9,
-            nickname : '팔로워9',
-        }
-    ],
-    followingList : [
-        {
-            id : 1,
-            nickname : '팔로윙1',
-        },
-        {
-            id : 2,
-            nickname : '팔로윙2',
-        },
-        {
-            id : 3,
-            nickname : '팔로윙3',
-        }
-    ],
+    followerList : [],
+    followingList : [],
+    hasMoreFollower : true,
+    hasMoreFollowing : true,
 });
+
+const totalFollowers = 10;
+const totalFollowings = 8;
+const limit = 3;
 
 export const mutations = {
     setMe( state,payload ){
@@ -74,6 +30,24 @@ export const mutations = {
     removeFollower(state,payload){
         const index = state.followerList.findIndex( v => v.id === payload.id);
         state.followerList.splice(index,1);
+    },
+    loadFollowings( state ){
+        const diff = totalFollowings - state.followingList.length;
+        const fakeUsers = Array( diff > limit ? limit : diff).fill().map( v => ({
+            id : Math.random().toString(),
+            nickname : Math.floor(Math.random() * 1000),
+        }));
+        state.followingList = state.followingList.concat(fakeUsers);
+        state.hasMoreFollowing = fakeUsers.length === limit;
+    },
+    loadFollowers( state ){
+        const diff = totalFollowers - state.followerList.length;
+        const fakeUsers = Array(diff > limit ? limit : diff).fill().map( v => ({
+            id : Math.random().toString(),
+            nickname : Math.floor(Math.random() * 1000),
+        }));
+        state.followerList = state.followerList.concat(fakeUsers);
+        state.hasMoreFollower = fakeUsers.length === limit;
     }
 };
 
@@ -101,5 +75,15 @@ export const actions = {
     },
     removeFollower( { commit } , payload ){
         commit('removeFollower',payload);
-    }
+    },
+    loadFollowers( { commit, state } , payload ){
+        if(state.hasMoreFollower){
+            commit('loadFollowers',payload);
+        }
+    },
+    loadFollowings( { commit, state } , payload ){
+        if(state.hasMoreFollowing){
+            commit('loadFollowings',payload);
+        }
+    },
 }
