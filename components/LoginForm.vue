@@ -69,9 +69,8 @@ export default {
     methods : {
         onSubmitForm(){
             if(this.$refs.form.validate()){
-               this.$store.dispatch('users/signUp',{
+               this.$store.dispatch('users/logIn',{
                    email : this.email,
-                   nickname : '심기준',
                    password : this.password
                })
                .then(() => {
