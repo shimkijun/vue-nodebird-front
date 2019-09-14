@@ -1,6 +1,7 @@
 export const state = () => ({
     mainPosts : [],
     hasMorePost : true,
+    imagePaths : []
 });
 
 const totalPosts = 33;
@@ -35,11 +36,29 @@ export const mutations = {
         state.mainPosts = state.mainPosts.concat(fakePosts);
         state.hasMorePost = fakePosts.length === limit;
     }, 
+    concatImagePaths(state,payload){
+        state.imagePaths = state.imagePaths.concat(payload);
+    },
+    removeImagePath(state,payload){
+        state.imagePaths.splice(payload,1);
+    }
 };
 
 export const actions = {
     add({ commit },payload){
-        commit('addMainPost',payload);
+        this.$axios.post('http://localhost:3085/post',{
+            content : payload.content,
+            imagePaths : state.imagePaths,
+        },{
+            withCredentials : true,
+        })
+        .then((res) => {
+            commit('addMainPost',res.data);
+        })
+        .catch((err) => {
+            console.error(err);
+            next(err);
+        });
     },
     remove({ commit }, payload){
         commit('removeMainPost' , payload )
@@ -51,5 +70,17 @@ export const actions = {
         if(state.hasMorePost){
             commit('loadPosts');
         }
+    },
+    uploadImages({ commit , state}, payload){
+        this.$axios.post('http://localhost:3085/post/images',payload,{
+            widthCredentials:true,
+        })
+        .then((res) => {
+            commit('concatImagePaths', res.data);
+        })
+        .catch((err) => {
+            console.error(err);
+
+        });
     },
 }
