@@ -82,11 +82,11 @@ export default {
         })
         
       },
-      removeFollowing(id){
-        this.$store.dispatch('users/removeFollowing',{id});
+      removeFollowing(userId){
+        this.$store.dispatch('users/unfollow',{userId});
       },
-      removeFollower(id){
-        this.$store.dispatch('users/removeFollower',{id});
+      removeFollower(userId){
+        this.$store.dispatch('users/removeFollower',{userId});
       },
       loadMoreFollowers(){
         this.$store.dispatch('users/loadFollowers');

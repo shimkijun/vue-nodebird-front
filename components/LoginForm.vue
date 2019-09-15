@@ -42,6 +42,11 @@
       <v-btn @click="onLogOut">
         Logout
       </v-btn>
+      <v-row>
+        <v-col cols="4">{{me.Followings.length}}팔로잉</v-col>
+        <v-col cols="4">{{me.Followers.length}}팔로워</v-col>
+        <v-col cols="4">{{me.Posts.length}}게시글</v-col>
+      </v-row>
     </v-card>
   </v-container>
 </template>
@@ -83,7 +88,6 @@ export default {
                });
                
             }
-            
         },
         onLogOut(){
             this.$store.dispatch('users/logOut');
@@ -91,6 +95,3 @@ export default {
     }
 }
 </script>
-<style >
-    
-</style>

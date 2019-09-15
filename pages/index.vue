@@ -16,7 +16,6 @@ export default {
     },
     data(){
         return{
-            name : 'Nuxt.js'
         }
     },
     computed : {
